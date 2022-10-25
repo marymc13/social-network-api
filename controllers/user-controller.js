@@ -13,7 +13,7 @@ const userController = {
 
   // get one user by id
   getUserById({ params }, res) {
-    User.findOne({ _id: params.userId })
+    User.findOne({ _id: params.id })
       .then(dbUserData => {
         // If no user is found, send 404
         if (!dbUserData) {
@@ -36,8 +36,12 @@ createUser(req, res) {
   },
 
   //update user
-  updateUser({ params, body }, res) {
-    User.findOneAndUpdate({ _id: params.userId }, body, { new: true })
+  updateUser(req, res) {
+    User.findOneAndUpdate({ _id: req.params.id},
+      {
+        $set: req.body,
+      },
+      { new: true })
       .then(dbUserData => {
         if (!dbUserData) {
           res.status(404).json({ message: 'No user found with this id!' });
@@ -50,7 +54,7 @@ createUser(req, res) {
 
   //delete user
   deleteUser({ params }, res) {
-    User.findOneAndDelete({ _id: params.userId })
+    User.findOneAndDelete({ _id: params.id })
       .then(dbUserData => {
         if (!dbUserData) {
           res.status(404).json({ message: 'No user found with this id!' });
