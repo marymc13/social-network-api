@@ -1,6 +1,14 @@
 const { Thoughts, User } = require('../models');
 
 const thoughtsController = {
+
+  //get all thoughts
+getAllThoughts(req, res) {
+  Thoughts.find({})
+    .then(dbThoughtsData => res.json(dbThoughtsData))
+    .catch(err => res.json(err))
+  },
+  //add thoughts
   addThoughts({ params, body }, res) {
     console.log(body);
     Thoughts.create(body)
@@ -21,6 +29,25 @@ const thoughtsController = {
       .catch(err => res.json(err));
   },
 
+  //get thoughts by id
+  getThoughtsById ({ params }, res) {
+    Thoughts.findOne({ _id: params.thoughtsId })
+    .populate({
+      path: "reactions",
+      select: "-__v"
+    })
+    .select('-__v')
+    .then (dbThoughtsData => {
+      if (!dbThoughtsData) {
+        res.status(404).json({ message: "No thought found."});
+        return;
+      }
+      res.json(dbThoughtsData);
+    })
+    .catch(err => res.json(err));
+  },
+
+  //remove thoughts
 removeThoughts({ params }, res) {
   Thoughts.findOneAndDelete({ _id: params.thoughtsId })
     .then(deletedThoughts => {
@@ -70,12 +97,12 @@ removeReaction({ params, body }, res) {
     { $pull: { reactions: { reactionId: body.reactionId } } },
     { new: true }
   )
-    .then((dbThoughtData) => {
-      if (!dbThoughtData) {
+    .then((dbThoughtsData) => {
+      if (!dbThoughtsData) {
      res.status(404).json({ message: 'No thought with this id!' });
     return; 
     }
-      res.json(dbThoughtData);
+      res.json(dbThoughtsData);
     })
     .catch(err => res.json(err));
   }
