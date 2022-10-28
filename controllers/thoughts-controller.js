@@ -91,10 +91,10 @@ addReaction({ params, body }, res) {
 
 
 // remove reaction from a thought
-removeReaction({ params, body }, res) {
+removeReaction(req, res) {
   Thoughts.findOneAndUpdate(
-    { _id: params.thoughtsId },
-    { $pull: { reactions: { reactionId: body.reactionId } } },
+    { _id: req.params.thoughtsId },
+    { $pull: { reactions: { reactionId: req.params.reactionId } } },
     { new: true }
   )
     .then((dbThoughtsData) => {
