@@ -9,13 +9,12 @@ getAllThoughts(req, res) {
     .catch(err => res.json(err))
   },
   //add thoughts
-  addThoughts({ params, body }, res) {
-    console.log(body);
-    Thoughts.create(body)
-      .then(({ _id }) => {
+  addThoughts(req, res) {
+    Thoughts.create(req.body)
+      .then((dbThoughtData) => {
         return User.findOneAndUpdate(
-          { _id: params.userId },
-          { $push: { thoughts: _id } },
+          { _id: req.body.userId },
+          { $push: { thoughts:dbThoughtData._id } },
           { new: true }
         );
       })
@@ -27,6 +26,7 @@ getAllThoughts(req, res) {
         res.json(dbUserData);
       })
       .catch(err => res.json(err));
+    
   },
 
   //get thoughts by id
@@ -56,7 +56,7 @@ removeThoughts({ params }, res) {
       }
       return Thoughts.findOneAndUpdate(
         { _id: params.userId },
-        { $pull: { comments: params.userId } },
+        { $pull: { comments: params.commentId } },
         { new: true }
       );
     })
